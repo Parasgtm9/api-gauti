@@ -18,8 +18,8 @@ app.get('/', function(req, res){
     });
 });
 
-//get all posts
-app.get('/posts', function(req, res){ 
+//get all tasks
+app.get('/tasks', function(req, res){ 
     fs.readFile('db.json', 'utf8', function(err, result) {
         if (err) {
             res.json({
@@ -27,24 +27,24 @@ app.get('/posts', function(req, res){
                 message: 'Something went wrong'
             });
         } else { 
-            var responseData = (result != '') ? JSON.parse(result).posts : [];
+            var responseData = (result != '') ? JSON.parse(result).tasks : [];
             res.send(responseData);
         }
     })
 })
 
-//add new post
-app.post('/post', function(req, res){  
+//add new task
+app.post('/task', function(req, res){  
 
     var finalObj = {};
-    finalObj.posts = [];
+    finalObj.tasks = [];
 
     var postObj = {
         id: getUuid(),
-        shirt_number: req.body.shirt_number,
+        player_shirt: req.body.player_shirt,
         player_name: req.body.player_name,
         position: req.body.position,
-        image: req.body.image
+        player_image: req.body.player_image
     }
 
     fs.readFile('db.json', 'utf8', function(err, result) {
@@ -55,9 +55,9 @@ app.post('/post', function(req, res){
             });
         } else { 
 
-            finalObj.posts = (result != '') ? JSON.parse(result).posts : [];
+            finalObj.tasks = (result != '') ? JSON.parse(result).tasks : [];
 
-            finalObj.posts.push(postObj);
+            finalObj.tasks.push(postObj);
 
             fs.writeFile('db.json', JSON.stringify(finalObj), (err, result) => {
                 if (err) {
@@ -66,10 +66,7 @@ app.post('/post', function(req, res){
                         message: 'Something went wrong'
                     });
                 }else{
-                    res.json({
-                        success: true,
-                        message: 'Data saved successfully'
-                    });
+                    res.json(postObj);
                 }
             });
 
@@ -78,7 +75,7 @@ app.post('/post', function(req, res){
 })
 
 //delete post
-app.delete('/post/:id', function(req, res){
+app.delete('/task/:id', function(req, res){
     console.log(req.params.id);
 
     var postId = req.params.id;
@@ -90,14 +87,14 @@ app.delete('/post/:id', function(req, res){
                 message: 'Something went wrong'
             });
         } else { 
-            var posts = (result != '') ? JSON.parse(result).posts : [];
+            var tasks = (result != '') ? JSON.parse(result).tasks : [];
 
-            var filteredData = posts.filter(function (e) {
+            var filteredData = tasks.filter(function (e) {
                 return e.id !==  postId;
             }); 
 
             var finalObj = {};
-            finalObj.posts = filteredData;
+            finalObj.tasks = filteredData;
 
             fs.writeFile('db.json', JSON.stringify(finalObj), (err, result) => {
                 if (err) {
